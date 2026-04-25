@@ -1,0 +1,30 @@
+name: broker-pro
+services:
+  - name: broker-pro-web
+    github:
+      branch: main
+      deploy_on_push: true
+      # Nota: Debes conectar tu repositorio desde el panel de DigitalOcean.
+      # DigitalOcean rellenará el campo repo de forma automática.
+    build_command: npm run build
+    run_command: npm start
+    environment_slug: node-js
+    instance_count: 1
+    instance_size_slug: basic-xxs
+    http_port: 3000
+    envs:
+      - key: DATABASE_URL
+        scope: RUN_AND_BUILD_TIME
+        type: SECRET
+      - key: NEXTAUTH_URL
+        scope: RUN_TIME
+        type: GENERAL
+      - key: NEXTAUTH_SECRET
+        scope: RUN_TIME
+        type: SECRET
+      - key: ADMIN_EMAIL
+        scope: RUN_TIME
+        type: GENERAL
+      - key: ADMIN_PASSWORD
+        scope: RUN_TIME
+        type: SECRET
