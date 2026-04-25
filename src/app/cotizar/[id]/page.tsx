@@ -5,10 +5,11 @@ import ResultsClient from './ResultsClient'
 export default async function ResultsPage({
   params,
 }: {
-  params: { id: string }
+  params: Promise<{ id: string }>
 }) {
+  const { id } = await params
   const quote = await prisma.quote.findUnique({
-    where: { id: params.id },
+    where: { id },
   })
 
   if (!quote) notFound()

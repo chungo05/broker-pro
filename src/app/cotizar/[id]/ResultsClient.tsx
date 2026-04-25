@@ -28,12 +28,20 @@ export default function ResultsClient({ quote }: Props) {
 
   async function handleSelect(carrierId: string, premium: number) {
     setSelected(carrierId)
-    await fetch(`/api/quote/${quote.id}/select`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ carrierId, premium }),
-    })
-    router.push(`/cotizar/${quote.id}/confirmar?carrier=${carrierId}`)
+    try {
+      const res = await fetch(`/api/quote/${quote.id}/select`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ carrierId, premium }),
+      })
+      if (!res.ok) {
+        setSelected(null)
+        return
+      }
+      router.push(`/cotizar/${quote.id}/confirmar?carrier=${carrierId}`)
+    } catch {
+      setSelected(null)
+    }
   }
 
   return (
