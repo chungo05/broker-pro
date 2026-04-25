@@ -11,7 +11,7 @@ Software para el broker de seguros Grupo Póliza Chung. Permite cotizar en múlt
 | Base de datos | PostgreSQL + Prisma v7 |
 | Auth | NextAuth v4 |
 | Pagos (futuro) | MercadoPago / SPEI |
-| Deploy | Vercel + Railway |
+| Deploy | Vercel + DigitalOcean |
 | Testing | Vitest |
 
 ## Arrancar el proyecto
@@ -19,7 +19,7 @@ Software para el broker de seguros Grupo Póliza Chung. Permite cotizar en múlt
 ```bash
 npm install
 cp .env.example .env.local
-# Llena DATABASE_URL y NEXTAUTH_SECRET en .env.local
+# Rellena al menos: DATABASE_URL, NEXTAUTH_SECRET, NEXTAUTH_URL, ADMIN_EMAIL, ADMIN_PASSWORD
 npx prisma generate
 npx prisma migrate dev
 npm run dev
@@ -27,6 +27,8 @@ npm run dev
 
 Notas:
 - Prisma CLI necesita que `DATABASE_URL` exista en el entorno. Este repo carga `.env` y `.env.local` desde `prisma.config.ts` (via `dotenv`), así que basta con tener `DATABASE_URL` en alguno de esos archivos.
+- **Postgres en Digital Ocean** (u otro con TLS): ver variables opcionales `PGSSL_*` en `.env.example` si ves errores de certificado.
+- **Formularios:** el texto que escribe el usuario en campos de entrada va en color **`#aa3a39`** (visible sobre fondo claro) en `/cotizar`, confirmación y login admin.
 
 ## Ver y probar el flujo (manual)
 
@@ -52,6 +54,13 @@ npm run dev
 5. **Descarga PDF**
 - En la misma pantalla usa “Descargar cotización en PDF”
 - Endpoint: `GET /api/quote/[id]/pdf`
+
+6. **Admin (Dashboard)**
+- Abre `http://localhost:3000/admin` — te pide inicio de sesión
+- Entra con `ADMIN_EMAIL` / `ADMIN_PASSWORD` (definidos en tu `.env`)
+- Verás un dashboard con KPIs (cotizaciones totales, conversión, prima promedio)
+- Puedes buscar clientes o filtrar las cotizaciones por su estado
+- En la tabla de las últimas cotizaciones, el enlace del vehículo abre el detalle en otra pestaña
 
 ## Documentación
 

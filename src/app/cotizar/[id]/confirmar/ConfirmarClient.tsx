@@ -160,7 +160,7 @@ export default function ConfirmarClient({ quote, selectedResult, readOnly }: Pro
                 required
                 value={form.name}
                 onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-                className="w-full border border-stone-200 rounded-lg px-3 py-2.5 text-sm bg-stone-50 focus:outline-none focus:border-stone-400"
+                className="w-full border border-stone-200 rounded-lg px-3 py-2.5 text-sm text-[#aa3a39] bg-stone-50 focus:outline-none focus:border-stone-400"
               />
             </div>
 
@@ -173,7 +173,7 @@ export default function ConfirmarClient({ quote, selectedResult, readOnly }: Pro
                 required
                 value={form.email}
                 onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
-                className="w-full border border-stone-200 rounded-lg px-3 py-2.5 text-sm bg-stone-50 focus:outline-none focus:border-stone-400"
+                className="w-full border border-stone-200 rounded-lg px-3 py-2.5 text-sm text-[#aa3a39] bg-stone-50 focus:outline-none focus:border-stone-400"
               />
             </div>
 
@@ -186,7 +186,7 @@ export default function ConfirmarClient({ quote, selectedResult, readOnly }: Pro
                 required
                 value={form.phone}
                 onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))}
-                className="w-full border border-stone-200 rounded-lg px-3 py-2.5 text-sm bg-stone-50 focus:outline-none focus:border-stone-400"
+                className="w-full border border-stone-200 rounded-lg px-3 py-2.5 text-sm text-[#aa3a39] bg-stone-50 focus:outline-none focus:border-stone-400"
                 placeholder="55 1234 5678"
               />
             </div>
@@ -199,7 +199,7 @@ export default function ConfirmarClient({ quote, selectedResult, readOnly }: Pro
                 value={form.rfc}
                 onChange={(e) => setForm((f) => ({ ...f, rfc: e.target.value.toUpperCase() }))}
                 maxLength={13}
-                className="w-full border border-stone-200 rounded-lg px-3 py-2.5 text-sm bg-stone-50 focus:outline-none focus:border-stone-400 uppercase"
+                className="w-full border border-stone-200 rounded-lg px-3 py-2.5 text-sm text-[#aa3a39] bg-stone-50 focus:outline-none focus:border-stone-400 uppercase"
                 placeholder="XAXX010101000"
               />
             </div>

@@ -7,6 +7,9 @@ broker-pro/
 ├── src/
 │   ├── app/
 │   │   ├── api/
+│   │   │   ├── auth/
+│   │   │   │   └── [...nextauth]/
+│   │   │   │       └── route.ts              ← NextAuth (GET+POST)
 │   │   │   └── quote/
 │   │   │       ├── route.ts                  ← POST /api/quote
 │   │   │       └── [id]/
@@ -24,17 +27,22 @@ broker-pro/
 │   │   │       └── confirmar/
 │   │   │           ├── page.tsx              ← Datos del cliente + resumen + PDF
 │   │   │           └── ConfirmarClient.tsx   ← Client component — formulario + UX
-│   │   ├── admin/                            ← (PENDIENTE) Dashboard protegido
-│   │   │   └── page.tsx
+│   │   ├── admin/
+│   │   │   ├── page.tsx                      ← Listado (server) — requiere sesión
+│   │   │   └── login/
+│   │   │       └── page.tsx                  ← Inicio de sesión
 │   │   ├── page.tsx
 │   │   ├── layout.tsx
+│   │   ├── providers.tsx                  ← `SessionProvider` (NextAuth)
 │   │   └── globals.css
+│   ├── middleware.ts                        ← Protege `/admin/*` excepto `/admin/login`
 │   └── lib/
-│       ├── db.ts                             ← Singleton Prisma v7 con adapter pg
+│       ├── db.ts                             ← Prisma v7 + `pg.Pool` (SSL, Digital Ocean)
+│       ├── auth.ts                           ← `authOptions` NextAuth (Credentials)
 │       ├── quote-schema.ts                    ← Zod schema para POST /api/quote
 │       ├── emit-quote-schema.ts               ← Zod schema para PATCH /emit
-│       └── pdf/
-│           └── quote-document.tsx             ← React-PDF Document
+│       ├── pdf/
+│       │   └── quote-document.tsx             ← React-PDF Document
 │       └── carriers/
 │           ├── types.ts                      ← QuoteRequest, QuoteResult, Coverage
 │           ├── utils.ts                      ← BRAND_BASE, COVERAGE_FACTOR, yearFactor()
@@ -43,11 +51,12 @@ broker-pro/
 │           ├── gnp.ts                        ← Mock GNP
 │           ├── axa.ts                        ← Mock AXA
 │           ├── hdi.ts                        ← Mock HDI
-│           └── qualitas.ts                   ← Mock Qualitas
+│           ├── qualitas.ts                   ← Mock Qualitas
+│           └── mapfre.ts                     ← Mock Mapfre
 ├── prisma/
 │   └── schema.prisma
 ├── prisma.config.ts                          ← Config de Prisma v7 (nuevo en v7)
-├── .env.local
+├── .env (o .env.local)
 └── .env.example
 ```
 
@@ -71,14 +80,15 @@ PATCH /api/quote/[id]/select
   → Guarda selectedCarrier, selectedPremium
   → status → SELECTED
         ↓
-(PENDIENTE) /cotizar/[id]/confirmar
+/cotizar/[id]/confirmar
   → Cliente llena nombre, email, teléfono
   → Resumen de cobertura elegida
   → PATCH /api/quote/[id]/emit → status EMITTED
   → Descarga de PDF: GET /api/quote/[id]/pdf
         ↓
-(PENDIENTE) Admin recibe notificación
-  → Dashboard muestra nueva cotización
+(Parcial) /admin
+  → Login: NextAuth (Credentials) en `/admin/login`
+  → Dashboard con KPIs, filtros (estado/búsqueda) y listado de cotizaciones
 ```
 
 ## Módulo de carriers
@@ -130,9 +140,16 @@ enum QuoteStatus {
 
 ```env
 DATABASE_URL=postgresql://user:pass@host:5432/brokerpro
+# Opcionales: TLS con Postgres gestionado (p. ej. Digital Ocean)
+# PGSSL_REJECT_UNAUTHORIZED=true
+# PGSSL_CA=-----BEGIN CERTIFICATE-----...
 NEXTAUTH_SECRET=genera-con-openssl-rand-base64-32
 NEXTAUTH_URL=http://localhost:3000
+ADMIN_EMAIL=admin@example.com
+ADMIN_PASSWORD=define-una-fuerte
 ```
+
+**UI (formularios):** en `/cotizar`, `/cotizar/.../confirmar` y `/admin/login` el texto de input usa el color de marca `text-[#aa3a39]` para asegurar legibilidad sobre `bg-stone-50`.
 
 ## Notas de Prisma v7
 
@@ -141,16 +158,12 @@ El cliente se importa desde `@prisma/client` (generado en `node_modules/@prisma/
 Se requiere `@prisma/adapter-pg` para conectar a PostgreSQL.
 
 ```typescript
-// src/lib/db.ts
+// src/lib/db.ts (resumen)
+// `pg.Pool` con `ssl: { rejectUnauthorized, ca }` según `PGSSL_*` y URL (Digital Ocean, etc.)
 import { PrismaPg } from '@prisma/adapter-pg'
 import { PrismaClient } from '@prisma/client'
-
-function createPrismaClient() {
-  const adapter = new PrismaPg({
-    connectionString: process.env.DATABASE_URL!,
-  })
-  return new PrismaClient({ adapter, log: ['error'] })
-}
+import { Pool } from 'pg'
+// new PrismaPg(new Pool({ host, user, database, port, password, ssl }))
 ```
 
 ```typescript

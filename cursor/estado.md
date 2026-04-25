@@ -33,6 +33,15 @@
 ### Base de datos
 - [x] Schema de Prisma definido (Quote, QuoteStatus)
 - [x] `prisma.config.ts` creado para Prisma v7
+- [x] `src/lib/db.ts` — conexión `pg.Pool` + SSL compatible con **Digital Ocean** (env `PGSSL_*`)
+
+### Admin (MVP)
+- [x] NextAuth v4 (Credentials) — usuario definido con `ADMIN_EMAIL` / `ADMIN_PASSWORD`
+- [x] `GET+POST /api/auth/[...nextauth]`
+- [x] `/admin/login` — inicio de sesión
+- [x] `/admin` — listado de cotizaciones (últimas 200)
+- [x] `middleware` — protege rutas bajo `/admin` excepto `/admin/login`
+- [ ] Filtros (status, fecha) y KPIs
 
 ---
 
@@ -69,15 +78,16 @@
 - [x] API route `GET /api/quote/[id]/pdf` que devuelve el PDF
 
 ### Dashboard admin
-- [ ] Configurar NextAuth con un usuario hardcodeado (email + password en `.env`)
-- [ ] `/admin` protegido con middleware
-- [ ] Lista de cotizaciones con filtros (status, fecha)
-- [ ] KPIs: total cotizaciones, tasa conversión (SELECTED/total), prima promedio
+- [x] Configurar NextAuth con un usuario vía `ADMIN_*` + `NEXTAUTH_SECRET` en `.env`
+- [x] `/admin` protegido con `middleware` (complementado con comprobación en server)
+- [x] Lista básica de cotizaciones
+- [x] Filtros (status, fecha) y búsqueda
+- [x] KPIs: total cotizaciones, tasa conversión (SELECTED/total), prima promedio
 - [ ] Alertas de pólizas próximas a vencer
 
 ### Carriers adicionales
 - [x] `qualitas.ts` — mock
-- [ ] `mapfre.ts` — mock
+- [x] `mapfre.ts` — mock
 - [ ] Integración real ANA Seguros (cuando el cliente entregue credenciales)
 
 ### Infraestructura
@@ -99,3 +109,5 @@
 | Select route en `src/app/cotizar/[id]/select/` | Era ruta de página | Movido a `src/app/api/quote/[id]/select/` |
 | Caché de Next.js apuntando a paths viejos | `.next/` desactualizado | `rm -rf .next` |
 | `PrismaConfigEnvError: DATABASE_URL` | Prisma CLI no leía `.env` | Cargar `.env`/`.env.local` en `prisma.config.ts` con `dotenv` |
+| `self-signed certificate in certificate chain` (Postgres, p. ej. DO) | TLS y CA del proveedor / Node | `pg` con SSL explícito; opcional `PGSSL_CA` o no verificar mientras (ver `.env.example`) |
+| Texto de inputs casi invisible en formularios | Sin `text-*` en inputs sobre fondo claro | Clase `text-[#aa3a39]` en inputs de `/cotizar` y `/cotizar/.../confirmar` (y admin login) |
