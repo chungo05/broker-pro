@@ -121,7 +121,7 @@ export default function CotizarPage() {
               value={form.brand}
               onChange={e => set('brand', e.target.value)}
               required
-              className="w-full border border-stone-200 rounded-lg px-3 py-2.5 text-sm bg-stone-50 focus:outline-none focus:border-stone-400"
+              className="w-full border border-stone-200 rounded-lg px-3 py-2.5 text-sm text-[#aa3a39] bg-stone-50 focus:outline-none focus:border-stone-400"
             >
               <option value="">Selecciona marca</option>
               {BRANDS.map(b => (
@@ -140,7 +140,7 @@ export default function CotizarPage() {
               onChange={e => set('model', e.target.value)}
               required
               disabled={!form.brand}
-              className="w-full border border-stone-200 rounded-lg px-3 py-2.5 text-sm bg-stone-50 focus:outline-none focus:border-stone-400 disabled:opacity-40"
+              className="w-full border border-stone-200 rounded-lg px-3 py-2.5 text-sm text-[#aa3a39] bg-stone-50 focus:outline-none focus:border-stone-400 disabled:opacity-40"
             >
               <option value="">
                 {form.brand ? 'Selecciona modelo' : 'Primero selecciona marca'}
@@ -160,7 +160,7 @@ export default function CotizarPage() {
               <select
                 value={form.year}
                 onChange={e => set('year', e.target.value)}
-                className="w-full border border-stone-200 rounded-lg px-3 py-2.5 text-sm bg-stone-50 focus:outline-none focus:border-stone-400"
+                className="w-full border border-stone-200 rounded-lg px-3 py-2.5 text-sm text-[#aa3a39] bg-stone-50 focus:outline-none focus:border-stone-400"
               >
                 {YEARS.map(y => <option key={y} value={y}>{y}</option>)}
               </select>
@@ -172,7 +172,7 @@ export default function CotizarPage() {
               <select
                 value={form.uso}
                 onChange={e => set('uso', e.target.value)}
-                className="w-full border border-stone-200 rounded-lg px-3 py-2.5 text-sm bg-stone-50 focus:outline-none focus:border-stone-400"
+                className="w-full border border-stone-200 rounded-lg px-3 py-2.5 text-sm text-[#aa3a39] bg-stone-50 focus:outline-none focus:border-stone-400"
               >
                 <option value="particular">Particular</option>
                 <option value="comercial">Comercial</option>
@@ -191,7 +191,7 @@ export default function CotizarPage() {
               onChange={e => set('zipCode', e.target.value.replace(/\D/g, '').slice(0, 5))}
               placeholder="76000"
               required
-              className="w-full border border-stone-200 rounded-lg px-3 py-2.5 text-sm bg-stone-50 focus:outline-none focus:border-stone-400"
+              className="w-full border border-stone-200 rounded-lg px-3 py-2.5 text-sm text-[#aa3a39] bg-stone-50 focus:outline-none focus:border-stone-400"
             />
           </div>
 
