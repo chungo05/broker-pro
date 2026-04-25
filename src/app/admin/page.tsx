@@ -200,7 +200,7 @@ export default async function AdminPage(props: {
                         </td>
                       </tr>
                     ) : (
-                      quotes.map((quote) => (
+                      quotes.map((quote: any) => (
                         <tr key={quote.id} className="group hover:bg-surface-container-low/30 transition-colors">
                           <td className="py-5">
                             <div className="flex items-center gap-3">
@@ -263,7 +263,7 @@ export default async function AdminPage(props: {
                 <div className="bg-surface-container-low rounded-xl p-8">
                   <h4 className="text-sm font-bold text-on-surface-variant uppercase tracking-widest mb-6">Próximos Pasos (Vencimientos)</h4>
                   <ul className="space-y-4">
-                    {expiringQuotes.map(q => (
+                    {expiringQuotes.map((q: any) => (
                       <li key={q.id} className="flex items-start gap-4">
                         <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center text-primary shadow-sm mt-0.5">
                           <span className="material-symbols-outlined text-sm">mail</span>
