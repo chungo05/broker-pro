@@ -62,184 +62,225 @@ export default async function AdminPage(props: {
   const averagePremium = premiumStats._avg.selectedPremium ?? 0
 
   return (
-    <main className="min-h-screen bg-stone-50 py-8 px-4">
-      <div className="max-w-6xl mx-auto space-y-8">
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <h1 className="text-2xl font-bold text-stone-900">Panel de Administración</h1>
-            <p className="text-stone-500 text-sm mt-1">
-              Sesión iniciada como: {session.user?.email}
-            </p>
+    <div className="bg-surface text-on-surface antialiased flex min-h-screen">
+      {/* SideNavBar Shell */}
+      <aside className="fixed left-0 top-0 h-screen w-64 border-r-0 bg-[#f2f4f6] dark:bg-slate-900 flex flex-col py-8 px-4 z-50">
+        <div className="mb-12 px-2 flex items-center gap-3">
+          <div className="w-10 h-10 bg-gradient-to-br from-[#003369] to-[#0a4a8f] rounded-xl flex items-center justify-center text-white shadow-lg">
+            <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>verified_user</span>
           </div>
-          <a
-            className="text-sm font-semibold text-stone-600 hover:text-stone-900 bg-white border border-stone-200 px-4 py-2 rounded-lg shadow-sm"
-            href="/api/auth/signout?callbackUrl=/"
-          >
-            Cerrar sesión
+          <div>
+            <h1 className="text-xl font-bold tracking-tighter text-[#003369] dark:text-white leading-none">BrokerPro</h1>
+            <p className="text-[10px] uppercase tracking-widest text-on-surface-variant/60 font-bold mt-1">Editorial Concierge</p>
+          </div>
+        </div>
+        <nav className="flex-1 space-y-2">
+          <a className="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 text-[#003369] dark:text-blue-400 font-bold border-r-2 border-[#003369] bg-white/50 dark:bg-slate-800/50" href="#">
+            <span className="material-symbols-outlined">request_quote</span>
+            <span>Cotizaciones</span>
+          </a>
+          <a className="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 text-[#424751] dark:text-slate-400 hover:text-[#003369] hover:bg-white/50 dark:hover:bg-slate-800/50" href="#">
+            <span className="material-symbols-outlined">description</span>
+            <span>Pólizas</span>
+          </a>
+        </nav>
+        <div className="mt-auto border-t border-outline-variant/10 pt-6">
+          <a className="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 text-[#424751] dark:text-slate-400 hover:text-error hover:bg-red-50" href="/api/auth/signout?callbackUrl=/">
+            <span className="material-symbols-outlined">logout</span>
+            <span>Cerrar Sesión</span>
           </a>
         </div>
+      </aside>
 
-        {/* KPIs */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-white p-6 rounded-2xl border border-stone-200 shadow-sm">
-            <h3 className="text-stone-500 text-sm font-medium">Cotizaciones Totales</h3>
-            <p className="text-3xl font-bold text-stone-900 mt-2">{totalQuotes}</p>
+      {/* Main Content Area */}
+      <main className="ml-64 flex-1">
+        <header className="sticky top-0 z-40 bg-transparent flex items-center justify-between px-12 py-6">
+          <div className="flex flex-col">
+            <h2 className="text-lg font-semibold text-[#003369] dark:text-white">Panel de Control</h2>
+            <p className="text-xs text-on-surface-variant font-medium">Bienvenido de nuevo, {session.user?.email}</p>
           </div>
-          <div className="bg-white p-6 rounded-2xl border border-stone-200 shadow-sm">
-            <h3 className="text-stone-500 text-sm font-medium">Tasa de Conversión</h3>
-            <p className="text-3xl font-bold text-stone-900 mt-2">{conversionRate.toFixed(1)}%</p>
+          <div className="flex items-center gap-6">
+            <form method="GET" className="relative group">
+              <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-sm">search</span>
+              <input name="q" defaultValue={q} className="bg-surface-container-low border-none rounded-full py-2 pl-10 pr-4 text-sm w-64 focus:ring-2 focus:ring-primary/20 transition-all text-on-surface" placeholder="Buscar cotización..." type="text"/>
+            </form>
+            <div className="h-10 w-10 rounded-full bg-primary-fixed flex items-center justify-center text-primary font-bold shadow-sm">
+              {session.user?.email?.[0].toUpperCase() ?? 'A'}
+            </div>
           </div>
-          <div className="bg-white p-6 rounded-2xl border border-stone-200 shadow-sm">
-            <h3 className="text-stone-500 text-sm font-medium">Prima Promedio (Conversiones)</h3>
-            <p className="text-3xl font-bold text-stone-900 mt-2">
-              ${averagePremium.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-            </p>
-          </div>
-        </div>
+        </header>
 
-        {/* Alerts */}
-        <div className="bg-amber-50 border border-amber-200 p-6 rounded-2xl shadow-sm">
-          <h3 className="text-amber-800 font-semibold mb-2 flex items-center gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-            </svg>
-            Alertas: Pólizas próximas a vencer
-          </h3>
-          {expiringQuotes.length === 0 ? (
-            <p className="text-amber-700 text-sm">No hay pólizas próximas a vencer (más de 11 meses de antigüedad).</p>
-          ) : (
-            <ul className="space-y-2 mt-4 text-sm text-amber-900">
-              {expiringQuotes.map((q) => (
-                <li key={q.id} className="flex items-center justify-between bg-amber-100/50 p-3 rounded-lg border border-amber-200/50">
-                  <div>
-                    <span className="font-semibold">{q.clientName || q.clientEmail || 'Cliente sin nombre'}</span>
-                    <span className="mx-2 text-amber-700/50">|</span>
-                    <span>{q.brand} {q.model} {q.year}</span>
-                  </div>
-                  <div className="flex items-center gap-4">
-                    <span className="text-amber-700 text-xs">
-                      Emitida el {q.createdAt.toLocaleDateString('es-MX')}
-                    </span>
-                    <Link
-                      href={`/cotizar/${q.id}`}
-                      target="_blank"
-                      className="text-amber-700 font-medium hover:text-amber-900 underline text-xs"
-                    >
-                      Ver detalle
-                    </Link>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
+        <div className="px-12 pb-12 space-y-10">
+          <section className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {/* Total Cotizaciones */}
+            <div className="bg-surface-container-lowest p-8 rounded-xl flex flex-col justify-between h-48 group hover:shadow-xl transition-all duration-500">
+              <div className="flex justify-between items-start">
+                <span className="text-on-surface-variant text-xs font-bold uppercase tracking-widest">Total Cotizaciones</span>
+                <div className="w-10 h-10 rounded-lg bg-primary-fixed flex items-center justify-center text-primary">
+                  <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>analytics</span>
+                </div>
+              </div>
+              <div>
+                <div className="text-[3.5rem] font-extrabold leading-none text-primary tracking-tighter">{totalQuotes}</div>
+              </div>
+            </div>
+            {/* Tasa de Conversión */}
+            <div className="bg-surface-container-lowest p-8 rounded-xl flex flex-col justify-between h-48 group hover:shadow-xl transition-all duration-500">
+              <div className="flex justify-between items-start">
+                <span className="text-on-surface-variant text-xs font-bold uppercase tracking-widest">Tasa de Conversión</span>
+                <div className="w-10 h-10 rounded-lg bg-secondary-container flex items-center justify-center text-secondary">
+                  <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>radar</span>
+                </div>
+              </div>
+              <div>
+                <div className="text-[3.5rem] font-extrabold leading-none text-on-surface tracking-tighter">{conversionRate.toFixed(1)}%</div>
+                <p className="text-on-surface-variant/60 text-xs mt-2 font-medium">Prima prom: ${averagePremium.toLocaleString('es-MX', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</p>
+              </div>
+            </div>
+            {/* Próximas a Vencer */}
+            <div className={`bg-surface-container-lowest p-8 rounded-xl flex flex-col justify-between h-48 group hover:shadow-xl transition-all duration-500 border-b-4 ${expiringQuotes.length > 0 ? 'border-tertiary-fixed-dim' : 'border-surface-container'}`}>
+              <div className="flex justify-between items-start">
+                <span className="text-on-surface-variant text-xs font-bold uppercase tracking-widest">Próximas a Vencer</span>
+                <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${expiringQuotes.length > 0 ? 'bg-tertiary-fixed-dim/20 text-tertiary-fixed-dim' : 'bg-surface-container text-outline'}`}>
+                  <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>priority_high</span>
+                </div>
+              </div>
+              <div>
+                <div className={`text-[3.5rem] font-extrabold leading-none tracking-tighter ${expiringQuotes.length > 0 ? 'text-tertiary-container' : 'text-outline'}`}>{expiringQuotes.length}</div>
+                <p className={`text-xs mt-2 font-bold flex items-center gap-1 ${expiringQuotes.length > 0 ? 'text-tertiary-container/70' : 'text-outline'}`}>
+                  {expiringQuotes.length > 0 ? 'Requiere atención inmediata' : 'Sin renovaciones pendientes'}
+                </p>
+              </div>
+            </div>
+          </section>
 
-        {/* Filters */}
-        <div className="bg-white p-4 rounded-2xl border border-stone-200 shadow-sm flex flex-col md:flex-row gap-4 justify-between items-center">
-          <form method="GET" className="flex flex-col md:flex-row gap-4 w-full md:w-auto">
-            <input
-              type="text"
-              name="q"
-              defaultValue={q}
-              placeholder="Buscar auto, email, nombre..."
-              className="border border-stone-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#aa3a39] w-full md:w-64 text-[#aa3a39]"
-            />
-            <select
-              name="status"
-              defaultValue={statusFilter ?? ''}
-              className="border border-stone-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#aa3a39] w-full md:w-auto text-[#aa3a39]"
-            >
-              <option value="">Todos los estados</option>
-              <option value="PENDING">Pendiente</option>
-              <option value="SELECTED">Seleccionada</option>
-              <option value="EMITTED">Emitida</option>
-            </select>
-            <button
-              type="submit"
-              className="bg-[#aa3a39] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#8e2e2e] transition-colors"
-            >
-              Filtrar
-            </button>
-            {(q || statusFilter) && (
-              <Link
-                href="/admin"
-                className="bg-stone-100 text-stone-600 px-4 py-2 rounded-lg text-sm font-medium hover:bg-stone-200 transition-colors text-center"
-              >
-                Limpiar
-              </Link>
-            )}
-          </form>
-          <div className="text-sm text-stone-500">
-            Mostrando {quotes.length} resultados
-          </div>
-        </div>
+          <div className="grid grid-cols-12 gap-8">
+            <section className="col-span-12 md:col-span-8 bg-surface-container-lowest rounded-xl p-8 shadow-sm">
+              <div className="flex flex-col lg:flex-row lg:items-center justify-between mb-8 gap-4">
+                <div>
+                  <h3 className="text-xl font-bold text-primary">Cotizaciones Recientes</h3>
+                  <p className="text-on-surface-variant text-xs mt-1">Mostrando {quotes.length} resultados</p>
+                </div>
+                <form method="GET" className="flex items-center gap-3">
+                  <select
+                    name="status"
+                    defaultValue={statusFilter ?? ''}
+                    className="bg-surface-container-low border-none rounded-lg py-2 px-4 text-xs font-bold text-on-surface focus:ring-2 focus:ring-primary/20 transition-all cursor-pointer"
+                  >
+                    <option value="">Todos los estados</option>
+                    <option value="PENDING">Pendiente</option>
+                    <option value="SELECTED">Seleccionada</option>
+                    <option value="EMITTED">Emitida</option>
+                  </select>
+                  <button type="submit" className="text-xs font-bold bg-primary text-on-primary px-3 py-2 rounded-lg hover:bg-primary-container transition-colors">
+                    Filtrar
+                  </button>
+                  {(q || statusFilter) && (
+                    <Link href="/admin" className="text-xs font-bold text-primary hover:underline">Limpiar</Link>
+                  )}
+                </form>
+              </div>
 
-        {/* Table */}
-        <div className="bg-white border border-stone-200 rounded-2xl overflow-hidden shadow-sm">
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm text-left">
-              <thead>
-                <tr className="border-b border-stone-200 bg-stone-50 text-xs uppercase tracking-wider text-stone-500">
-                  <th className="px-4 py-3 font-semibold">Fecha</th>
-                  <th className="px-4 py-3 font-semibold">Estado</th>
-                  <th className="px-4 py-3 font-semibold">Vehículo</th>
-                  <th className="px-4 py-3 font-semibold">Aseguradora</th>
-                  <th className="px-4 py-3 font-semibold text-right">Prima anual</th>
-                  <th className="px-4 py-3 font-semibold">Contacto</th>
-                </tr>
-              </thead>
-              <tbody>
-                {quotes.length === 0 ? (
-                  <tr>
-                    <td colSpan={6} className="px-4 py-8 text-center text-stone-500">
-                      No se encontraron cotizaciones con estos filtros.
-                    </td>
-                  </tr>
-                ) : (
-                  quotes.map((quote) => (
-                    <tr
-                      key={quote.id}
-                      className="border-b border-stone-100 last:border-0 hover:bg-stone-50/80"
-                    >
-                      <td className="px-4 py-2.5 text-stone-600 whitespace-nowrap">
-                        {quote.createdAt.toLocaleString('es-MX', {
-                          dateStyle: 'short',
-                          timeStyle: 'short',
-                        })}
-                      </td>
-                      <td className="px-4 py-2.5 text-stone-800">
-                        {STATUS_LABEL[quote.status] ?? quote.status}
-                      </td>
-                      <td className="px-4 py-2.5 text-stone-800">
-                        <Link
-                          className="font-medium text-[#aa3a39] hover:underline"
-                          href={`/cotizar/${quote.id}`}
-                          target="_blank"
-                          rel="noreferrer"
-                        >
-                          {quote.brand} {quote.model} {quote.year}
-                        </Link>
-                      </td>
-                      <td className="px-4 py-2.5 text-stone-800">
-                        {quote.selectedCarrier ?? '—'}
-                      </td>
-                      <td className="px-4 py-2.5 text-right text-stone-800 tabular-nums">
-                        {quote.selectedPremium != null
-                          ? `$${quote.selectedPremium.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
-                          : '—'}
-                      </td>
-                      <td className="px-4 py-2.5 text-stone-600 text-xs break-all max-w-[12rem]">
-                        {quote.clientName && <div className="font-medium text-stone-800">{quote.clientName}</div>}
-                        {quote.clientEmail ?? '—'}
-                      </td>
+              <div className="overflow-x-auto">
+                <table className="w-full text-left">
+                  <thead>
+                    <tr className="text-on-surface-variant/50 text-[10px] uppercase tracking-[0.2em] font-bold">
+                      <th className="pb-4 font-bold">Cliente</th>
+                      <th className="pb-4 font-bold">Vehículo</th>
+                      <th className="pb-4 font-bold">Aseguradora</th>
+                      <th className="pb-4 font-bold">Estado</th>
+                      <th className="pb-4 text-right font-bold">Detalle</th>
                     </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
+                  </thead>
+                  <tbody className="divide-y divide-surface-container/30">
+                    {quotes.length === 0 ? (
+                      <tr>
+                        <td colSpan={5} className="py-8 text-center text-on-surface-variant font-medium text-sm">
+                          No se encontraron cotizaciones con estos filtros.
+                        </td>
+                      </tr>
+                    ) : (
+                      quotes.map((quote) => (
+                        <tr key={quote.id} className="group hover:bg-surface-container-low/30 transition-colors">
+                          <td className="py-5">
+                            <div className="flex items-center gap-3">
+                              <div className="w-8 h-8 rounded-full bg-surface-container-high flex items-center justify-center text-xs font-bold text-primary">
+                                {quote.clientName?.[0]?.toUpperCase() ?? quote.clientEmail?.[0]?.toUpperCase() ?? 'U'}
+                              </div>
+                              <div>
+                                <span className="text-sm font-semibold text-on-surface block">{quote.clientName ?? 'Sin Nombre'}</span>
+                                <span className="text-xs text-on-surface-variant">{quote.clientEmail ?? quote.clientPhone ?? 'Sin contacto'}</span>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="py-5 text-sm text-on-surface-variant">
+                            {quote.brand} {quote.model}
+                            <span className="block text-xs opacity-70">{quote.year}</span>
+                          </td>
+                          <td className="py-5">
+                            <span className="text-sm font-medium">{quote.selectedCarrier ?? '—'}</span>
+                            {quote.selectedPremium != null && (
+                              <span className="block text-xs text-on-surface-variant">${quote.selectedPremium.toLocaleString('es-MX', { minimumFractionDigits: 0 })}</span>
+                            )}
+                          </td>
+                          <td className="py-5">
+                            <span className={`inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                              quote.status === 'EMITTED' ? 'bg-secondary-container/30 text-secondary' :
+                              quote.status === 'SELECTED' ? 'bg-primary-fixed text-primary' :
+                              'bg-surface-container-high text-on-surface-variant'
+                            }`}>
+                              {STATUS_LABEL[quote.status] ?? quote.status}
+                            </span>
+                          </td>
+                          <td className="py-5 text-right">
+                            <Link href={`/cotizar/${quote.id}`} target="_blank" className="text-primary hover:bg-primary-fixed inline-block p-1.5 rounded-lg transition-colors">
+                              <span className="material-symbols-outlined text-sm">visibility</span>
+                            </Link>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </section>
+
+            <section className="col-span-12 md:col-span-4 space-y-8">
+              <div className="relative overflow-hidden rounded-xl p-8 bg-gradient-to-br from-[#003369] to-[#0a4a8f] text-white flex flex-col justify-end shadow-2xl">
+                <div className="absolute top-0 right-0 p-4 opacity-20 transform translate-x-4 -translate-y-4 pointer-events-none">
+                  <span className="material-symbols-outlined text-[120px]">workspace_premium</span>
+                </div>
+                <div className="relative z-10">
+                  <h4 className="text-2xl font-extrabold tracking-tighter leading-tight">Portafolio Pro</h4>
+                  <p className="text-on-primary-container text-xs mt-3 leading-relaxed">Analítica avanzada y seguimientos automatizados para tu cartera.</p>
+                  <button className="mt-6 bg-white text-primary px-6 py-2.5 rounded-full text-xs font-bold hover:bg-primary-fixed transition-colors">
+                    Ver Reportes
+                  </button>
+                </div>
+              </div>
+
+              {expiringQuotes.length > 0 && (
+                <div className="bg-surface-container-low rounded-xl p-8">
+                  <h4 className="text-sm font-bold text-on-surface-variant uppercase tracking-widest mb-6">Próximos Pasos (Vencimientos)</h4>
+                  <ul className="space-y-4">
+                    {expiringQuotes.map(q => (
+                      <li key={q.id} className="flex items-start gap-4">
+                        <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center text-primary shadow-sm mt-0.5">
+                          <span className="material-symbols-outlined text-sm">mail</span>
+                        </div>
+                        <div>
+                          <p className="text-sm font-bold">Contactar a {q.clientName ?? 'Cliente'}</p>
+                          <p className="text-[11px] text-on-surface-variant mt-0.5">Renovar {q.brand} {q.model}</p>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </section>
           </div>
         </div>
-      </div>
-    </main>
+      </main>
+    </div>
   )
 }

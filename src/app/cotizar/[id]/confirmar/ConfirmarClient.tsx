@@ -71,149 +71,188 @@ export default function ConfirmarClient({ quote, selectedResult, readOnly }: Pro
   }
 
   return (
-    <main className="min-h-screen bg-stone-50 py-10 px-4">
-      <div className="max-w-lg mx-auto">
-        <div className="mb-8">
-          <p className="text-xs font-semibold uppercase tracking-wider text-stone-400 mb-1">
-            {readOnly ? 'Solicitud enviada' : 'Confirmar cotización'}
-          </p>
-          <h1 className="text-2xl font-bold text-stone-900">
-            {readOnly ? 'Gracias por tu solicitud' : 'Tus datos'}
-          </h1>
-          <p className="text-stone-500 text-sm mt-1">
-            {readOnly
-              ? 'Un asesor revisará tu caso y te contactará pronto.'
-              : 'Completa el formulario para solicitar la póliza con la opción elegida.'}
-          </p>
+    <div className="bg-surface flex flex-col min-h-screen">
+      <nav className="bg-gradient-to-r from-[#003369] to-[#0A4A8F] dark:from-slate-900 dark:to-blue-900 text-white font-sans text-lg font-bold tracking-tight docked full-width top-0 rounded-b-none no-border shadow-2xl shadow-blue-900/20 shadow-[0px_40px_60px_rgba(25,28,30,0.08)] flex items-center justify-between px-6 h-20 w-full fixed z-50">
+        <div onClick={() => router.back()} className="flex items-center gap-4 active:scale-95 duration-200 cursor-pointer">
+          <span className="material-symbols-outlined text-white" style={{ fontVariationSettings: "'FILL' 0" }}>arrow_back</span>
         </div>
+        <div className="absolute left-1/2 -translate-x-1/2">
+          <span className="text-white opacity-100">Paso 3 de 3</span>
+        </div>
+        <div className="text-white font-black text-xl">BrokerPro</div>
+      </nav>
 
-        <div className="bg-white rounded-2xl border border-stone-200 p-6 mb-6 shadow-sm">
-          <h2 className="text-xs font-semibold uppercase tracking-wider text-stone-500 mb-3">
-            Resumen
-          </h2>
-          <p className="text-stone-900 font-medium">
-            {quote.brand.charAt(0).toUpperCase() + quote.brand.slice(1)} {quote.model}{' '}
-            {quote.year}
+      <main className="flex-grow pt-28 pb-12 px-6 max-w-md mx-auto w-full">
+        {!readOnly && (
+          <div className="flex gap-2 mb-8 justify-center">
+            <div className="h-2 w-12 rounded-full bg-secondary"></div>
+            <div className="h-2 w-12 rounded-full bg-secondary"></div>
+            <div className="h-2 w-12 rounded-full bg-primary"></div>
+          </div>
+        )}
+
+        <header className="mb-10 text-center">
+          <h1 className="text-on-surface font-black text-[2.5rem] leading-tight tracking-tighter mb-2">
+            {readOnly ? '¡Póliza Emitida!' : '¡Excelente elección!'}
+          </h1>
+          <p className="text-on-surface-variant text-lg">
+            {readOnly ? 'Tus datos han sido registrados con éxito.' : 'Confirma tus datos para finalizar la contratación.'}
           </p>
-          <p className="text-sm text-stone-500 mt-1">
-            {quote.uso === 'particular' ? 'Uso particular' : 'Uso comercial'} · CP {quote.zipCode}
-          </p>
-          <p className="text-sm text-stone-500">
-            Cobertura {COVERAGE_LABEL[quote.coverage] ?? quote.coverage}
-          </p>
-          <div className="mt-4 pt-4 border-t border-stone-100 flex justify-between items-center">
-            <div>
-              <p className="text-sm font-semibold text-stone-900">{selectedResult.carrierName}</p>
-              <p className="text-xs text-stone-400">{selectedResult.rating}</p>
+        </header>
+
+        <section className="bg-surface-container-lowest rounded-xl shadow-[0px_40px_60px_rgba(25,28,30,0.08)] p-8 mb-10 overflow-hidden relative border border-outline-variant/15">
+          <div className="absolute top-0 right-0 p-4 opacity-10 pointer-events-none">
+            <span className="material-symbols-outlined text-[80px]" style={{ fontVariationSettings: "'FILL' 1" }}>verified_user</span>
+          </div>
+          <div className="relative z-10">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-12 h-12 bg-surface-container-low rounded-lg flex items-center justify-center">
+                <span className="material-symbols-outlined text-primary text-3xl" style={{ fontVariationSettings: "'FILL' 1" }}>
+                  {selectedResult.carrierId === 'mapfre' ? 'verified_user' : selectedResult.carrierId === 'hdi' ? 'security' : 'shield'}
+                </span>
+              </div>
+              <div>
+                <p className="text-on-surface-variant font-medium text-xs uppercase tracking-widest">Aseguradora</p>
+                <p className="text-on-surface font-bold text-xl">{selectedResult.carrierName}</p>
+              </div>
             </div>
-            <div className="text-right">
-              <p className="text-xl font-extrabold text-stone-900">
-                ${selectedResult.annualPremium.toLocaleString('es-MX')}
+
+            <div className="mb-8">
+              <p className="text-on-surface-variant font-medium text-xs uppercase tracking-widest mb-1">Vehículo</p>
+              <div className="flex items-center gap-2">
+                <span className="material-symbols-outlined text-on-surface-variant">directions_car</span>
+                <p className="text-on-surface font-semibold text-lg">{quote.brand.charAt(0).toUpperCase() + quote.brand.slice(1)} {quote.model} {quote.year}</p>
+              </div>
+              <p className="text-on-surface-variant text-sm mt-1 ml-8">Cobertura {COVERAGE_LABEL[quote.coverage]} · Uso {quote.uso}</p>
+            </div>
+
+            <div className="pt-6 border-t border-surface-container-highest">
+              <p className="text-on-surface-variant font-medium text-xs uppercase tracking-widest mb-1">Precio Final</p>
+              <p className="text-primary font-black text-4xl">${selectedResult.annualPremium.toLocaleString('es-MX')} <span className="text-lg font-bold">MXN</span></p>
+              <p className="text-secondary font-bold text-sm mt-1 flex items-center gap-1">
+                <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
+                Incluye todos los impuestos
               </p>
-              <p className="text-xs text-stone-400">anual</p>
             </div>
           </div>
-          <a
-            href={`/api/quote/${quote.id}/pdf`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-4 inline-block text-sm font-semibold text-red-700 hover:text-red-800 underline decoration-red-200 underline-offset-2"
-          >
-            Descargar cotización en PDF
-          </a>
-        </div>
+        </section>
 
         {readOnly ? (
-          <div className="bg-white rounded-2xl border border-stone-200 p-6 shadow-sm space-y-2 text-sm">
-            <p>
-              <span className="text-stone-500">Nombre:</span>{' '}
-              <span className="font-medium text-stone-900">{quote.clientName}</span>
-            </p>
-            <p>
-              <span className="text-stone-500">Correo:</span>{' '}
-              <span className="font-medium text-stone-900">{quote.clientEmail}</span>
-            </p>
-            <p>
-              <span className="text-stone-500">Teléfono:</span>{' '}
-              <span className="font-medium text-stone-900">{quote.clientPhone}</span>
-            </p>
-            {quote.clientRfc ? (
-              <p>
-                <span className="text-stone-500">RFC:</span>{' '}
-                <span className="font-medium text-stone-900">{quote.clientRfc}</span>
-              </p>
-            ) : null}
-          </div>
+          <section className="bg-surface-container-lowest rounded-xl shadow-[0px_40px_60px_rgba(25,28,30,0.08)] p-8 mb-10 overflow-hidden relative border border-outline-variant/15 space-y-4">
+            <h2 className="font-bold text-lg text-primary mb-2">Tus Datos</h2>
+            <div>
+              <p className="text-on-surface-variant text-sm">Nombre</p>
+              <p className="text-on-surface font-medium">{quote.clientName}</p>
+            </div>
+            <div>
+              <p className="text-on-surface-variant text-sm">Correo</p>
+              <p className="text-on-surface font-medium">{quote.clientEmail}</p>
+            </div>
+            <div>
+              <p className="text-on-surface-variant text-sm">Teléfono</p>
+              <p className="text-on-surface font-medium">{quote.clientPhone}</p>
+            </div>
+            {quote.clientRfc && (
+              <div>
+                <p className="text-on-surface-variant text-sm">RFC</p>
+                <p className="text-on-surface font-medium">{quote.clientRfc}</p>
+              </div>
+            )}
+            
+            <a href={`/api/quote/${quote.id}/pdf`} target="_blank" rel="noopener noreferrer" className="mt-4 w-full h-16 border-2 border-primary text-primary rounded-xl font-bold text-lg active:scale-95 transition-transform flex items-center justify-center gap-3 bg-transparent hover:bg-primary-fixed/20">
+              <span className="material-symbols-outlined">picture_as_pdf</span>
+              Descargar PDF de Póliza
+            </a>
+          </section>
         ) : (
-          <form onSubmit={handleSubmit} className="bg-white rounded-2xl border border-stone-200 p-6 shadow-sm space-y-4">
-            {error ? (
-              <p className="text-sm text-red-600 bg-red-50 border border-red-100 rounded-lg px-3 py-2">
+          <form onSubmit={handleSubmit} className="space-y-6 mb-12">
+            {error && (
+              <div className="bg-error-container text-on-error-container p-4 rounded-xl font-medium border border-[#ffb4ab]">
                 {error}
-              </p>
-            ) : null}
+              </div>
+            )}
 
-            <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-stone-500 mb-1.5">
-                Nombre completo
-              </label>
-              <input
-                required
-                value={form.name}
-                onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-                className="w-full border border-stone-200 rounded-lg px-3 py-2.5 text-sm text-[#aa3a39] bg-stone-50 focus:outline-none focus:border-stone-400"
-              />
+            <div className="space-y-2">
+              <label className="text-on-surface-variant font-bold text-sm px-1">Tu Nombre Completo</label>
+              <div className="relative">
+                <input
+                  type="text"
+                  required
+                  value={form.name}
+                  onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
+                  className="w-full bg-surface-container-highest border-none rounded-xl h-16 px-6 text-lg text-on-surface focus:ring-2 focus:ring-primary focus:bg-surface-container-lowest transition-all placeholder:text-outline"
+                  placeholder="Ej. Juan Pérez García"
+                />
+              </div>
             </div>
 
-            <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-stone-500 mb-1.5">
-                Correo electrónico
-              </label>
-              <input
-                type="email"
-                required
-                value={form.email}
-                onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
-                className="w-full border border-stone-200 rounded-lg px-3 py-2.5 text-sm text-[#aa3a39] bg-stone-50 focus:outline-none focus:border-stone-400"
-              />
+            <div className="space-y-2">
+              <label className="text-on-surface-variant font-bold text-sm px-1">Correo Electrónico</label>
+              <div className="relative">
+                <input
+                  type="email"
+                  required
+                  value={form.email}
+                  onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
+                  className="w-full bg-surface-container-highest border-none rounded-xl h-16 px-6 text-lg text-on-surface focus:ring-2 focus:ring-primary focus:bg-surface-container-lowest transition-all placeholder:text-outline"
+                  placeholder="nombre@ejemplo.com"
+                />
+              </div>
             </div>
 
-            <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-stone-500 mb-1.5">
-                Teléfono (10 dígitos o más)
-              </label>
-              <input
-                type="tel"
-                required
-                value={form.phone}
-                onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))}
-                className="w-full border border-stone-200 rounded-lg px-3 py-2.5 text-sm text-[#aa3a39] bg-stone-50 focus:outline-none focus:border-stone-400"
-                placeholder="55 1234 5678"
-              />
+            <div className="space-y-2">
+              <label className="text-on-surface-variant font-bold text-sm px-1">Teléfono Celular</label>
+              <div className="relative">
+                <input
+                  type="tel"
+                  required
+                  value={form.phone}
+                  onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))}
+                  className="w-full bg-surface-container-highest border-none rounded-xl h-16 px-6 text-lg text-on-surface focus:ring-2 focus:ring-primary focus:bg-surface-container-lowest transition-all placeholder:text-outline"
+                  placeholder="55 0000 0000"
+                />
+              </div>
             </div>
 
-            <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-stone-500 mb-1.5">
-                RFC <span className="font-normal text-stone-400">(opcional)</span>
-              </label>
-              <input
-                value={form.rfc}
-                onChange={(e) => setForm((f) => ({ ...f, rfc: e.target.value.toUpperCase() }))}
-                maxLength={13}
-                className="w-full border border-stone-200 rounded-lg px-3 py-2.5 text-sm text-[#aa3a39] bg-stone-50 focus:outline-none focus:border-stone-400 uppercase"
-                placeholder="XAXX010101000"
-              />
+            <div className="space-y-2">
+              <label className="text-on-surface-variant font-bold text-sm px-1">RFC <span className="font-normal text-outline">(opcional)</span></label>
+              <div className="relative">
+                <input
+                  type="text"
+                  value={form.rfc}
+                  onChange={(e) => setForm((f) => ({ ...f, rfc: e.target.value.toUpperCase() }))}
+                  maxLength={13}
+                  className="w-full bg-surface-container-highest border-none rounded-xl h-16 px-6 text-lg text-on-surface focus:ring-2 focus:ring-primary focus:bg-surface-container-lowest transition-all placeholder:text-outline uppercase"
+                  placeholder="XAXX010101000"
+                />
+              </div>
             </div>
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-red-600 hover:bg-red-700 disabled:bg-stone-300 text-white font-bold rounded-xl py-3 text-sm tracking-wide transition-colors"
-            >
-              {loading ? 'Enviando…' : 'Solicitar póliza'}
-            </button>
+            <section className="flex flex-col gap-4 mt-8">
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full h-16 bg-gradient-to-r from-secondary to-[#008542] text-white rounded-xl font-bold text-xl shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-3 disabled:opacity-60 disabled:pointer-events-none hover:brightness-110"
+              >
+                {loading ? 'Procesando...' : 'Emitir Póliza'}
+                {!loading && <span className="material-symbols-outlined">arrow_forward</span>}
+              </button>
+              <a href={`/api/quote/${quote.id}/pdf`} target="_blank" rel="noopener noreferrer" className="w-full h-16 border-2 border-primary text-primary rounded-xl font-bold text-lg active:scale-95 transition-transform flex items-center justify-center gap-3 bg-transparent hover:bg-primary-fixed/20">
+                <span className="material-symbols-outlined">picture_as_pdf</span>
+                Descargar PDF de Cotización
+              </a>
+            </section>
           </form>
         )}
-      </div>
-    </main>
+      </main>
+
+      <footer className="bg-[#f2f4f6] dark:bg-slate-900 w-full py-8 flex flex-col items-center gap-4 mt-auto">
+        <div className="flex gap-6">
+          <a className="font-sans text-[12px] font-medium uppercase tracking-widest text-[#0A4A8F] dark:text-blue-400 hover:text-primary transition-colors" href="#">Privacidad</a>
+          <a className="font-sans text-[12px] font-medium uppercase tracking-widest text-[#0A4A8F] dark:text-blue-400 hover:text-primary transition-colors" href="#">Soporte</a>
+        </div>
+        <p className="font-sans text-[12px] font-medium uppercase tracking-widest text-slate-500 dark:text-slate-400">© 2026 BrokerPro Insurance</p>
+      </footer>
+    </div>
   )
 }

@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import type { QuoteResult } from '@/lib/carriers/types'
 
 interface Props {
@@ -45,112 +46,116 @@ export default function ResultsClient({ quote }: Props) {
   }
 
   return (
-    <main className="min-h-screen bg-stone-50 py-10 px-4">
-      <div className="max-w-2xl mx-auto">
-
-        {/* Header */}
-        <div className="mb-8">
-          <p className="text-xs font-semibold uppercase tracking-wider text-stone-400 mb-1">
-            Cotización
-          </p>
-          <h1 className="text-2xl font-bold text-stone-900">
-            {quote.brand.charAt(0).toUpperCase() + quote.brand.slice(1)} {quote.model} {quote.year}
-          </h1>
-          <p className="text-stone-500 text-sm mt-1">
-            Cobertura {COVERAGE_LABEL[quote.coverage]} · {quote.results.length} aseguradoras
-          </p>
+    <div className="bg-surface text-on-surface min-h-screen pb-32">
+      <header className="sticky top-0 z-50 bg-[#f8f9fb] dark:bg-slate-950 editorial-shadow">
+        <div className="flex items-center justify-between px-6 py-4 w-full max-w-3xl mx-auto">
+          <div className="flex items-center gap-4">
+            <button onClick={() => router.back()} className="transition-all duration-300 ease-in-out active:scale-95 text-[#003369] dark:text-blue-400 p-2 rounded-full hover:bg-slate-100 flex items-center justify-center">
+              <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 0" }}>arrow_back</span>
+            </button>
+            <h1 className="font-sans font-bold text-3xl leading-tight text-[#003369] dark:text-blue-400">Paso 2 de 3</h1>
+          </div>
+          <button className="transition-all duration-300 ease-in-out active:scale-95 text-[#003369] dark:text-blue-400 p-2 rounded-full hover:bg-slate-100 flex items-center justify-center">
+            <span className="material-symbols-outlined">help_outline</span>
+          </button>
         </div>
+      </header>
 
-        {/* Cards */}
-        <div className="space-y-3">
+      <main className="max-w-xl mx-auto px-6 py-8">
+        <section className="mb-10 text-center md:text-left">
+          <h2 className="text-[3.5rem] font-black leading-[1.1] tracking-tight text-primary mb-4">
+            Opciones de Seguro para tu <span className="text-primary-container">{quote.brand.charAt(0).toUpperCase() + quote.brand.slice(1)} {quote.model}</span>
+          </h2>
+          <p className="text-[1.125rem] text-on-surface-variant font-medium">
+            Compara y elige la mejor opción para ti. Cobertura {COVERAGE_LABEL[quote.coverage]}.
+          </p>
+        </section>
+
+        <div className="space-y-8">
           {quote.results.map((r, i) => (
-            <div
-              key={r.carrierId}
-              className={`bg-white rounded-2xl border p-5 transition-all ${
-                i === 0
-                  ? 'border-green-400 shadow-sm shadow-green-50'
-                  : 'border-stone-200'
-              }`}
-            >
-              {i === 0 && (
-                <div className="text-xs font-bold text-green-600 uppercase tracking-wider mb-3">
-                  ★ Mejor precio
-                </div>
-              )}
-
-              <div className="flex items-start justify-between gap-4">
-                {/* Carrier info */}
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="font-bold text-stone-900">{r.carrierName}</span>
-                    <span className="text-xs font-semibold bg-stone-100 text-stone-500 px-2 py-0.5 rounded">
-                      {r.rating}
-                    </span>
+            <div key={r.carrierId} className="bg-surface-container-lowest rounded-xl editorial-shadow overflow-hidden transition-transform active:scale-[0.98]">
+              <div className="p-8">
+                <div className="flex justify-between items-start mb-6">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-lg bg-surface-container flex items-center justify-center">
+                      <span className="material-symbols-outlined text-primary text-3xl" style={{ fontVariationSettings: "'FILL' 1" }}>
+                        {r.carrierId === 'mapfre' ? 'verified_user' : r.carrierId === 'hdi' ? 'security' : 'shield'}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-2xl font-bold tracking-tight text-on-surface block">{r.carrierName}</span>
+                      <span className="text-xs font-semibold text-outline-variant">{r.rating}</span>
+                    </div>
                   </div>
-
-                  {/* Coberturas */}
-                  <div className="flex flex-wrap gap-1.5 mt-2">
-                    {r.coverage.danosMaterialesDeducible && (
-                      <span className="text-xs bg-stone-50 border border-stone-200 text-stone-600 px-2 py-0.5 rounded-full">
-                        DM {r.coverage.danosMaterialesDeducible}
-                      </span>
-                    )}
-                    {r.coverage.roboTotal && (
-                      <span className="text-xs bg-stone-50 border border-stone-200 text-stone-600 px-2 py-0.5 rounded-full">
-                        RT {r.coverage.roboTotal}
-                      </span>
-                    )}
-                    {r.coverage.rcMonto && (
-                      <span className="text-xs bg-stone-50 border border-stone-200 text-stone-600 px-2 py-0.5 rounded-full">
-                        RC ${r.coverage.rcMonto}
-                      </span>
-                    )}
-                    {r.coverage.gastosMedicos && (
-                      <span className="text-xs bg-stone-50 border border-stone-200 text-stone-600 px-2 py-0.5 rounded-full">
-                        GM ${r.coverage.gastosMedicos}
-                      </span>
-                    )}
-                    {r.coverage.asistenciaVial && (
-                      <span className="text-xs bg-stone-50 border border-stone-200 text-stone-600 px-2 py-0.5 rounded-full">
-                        Asistencia vial
-                      </span>
-                    )}
-                  </div>
-
-                  <p className="text-xs text-stone-400 mt-2">
-                    Respondió en {r.responseTime}ms
-                  </p>
+                  {i === 0 && (
+                    <span className="bg-primary-fixed text-on-primary-fixed px-3 py-1 rounded-full text-[0.75rem] font-bold uppercase tracking-widest">Recomendado</span>
+                  )}
                 </div>
 
-                {/* Precio + CTA */}
-                <div className="text-right flex-shrink-0">
-                  <div className="text-2xl font-extrabold text-stone-900 leading-none">
-                    ${r.annualPremium.toLocaleString('es-MX')}
-                  </div>
-                  <div className="text-xs text-stone-400 mt-0.5 mb-3">
-                    ≈ ${r.monthlyPremium.toLocaleString('es-MX')}/mes
-                  </div>
-                  <button
-                    onClick={() => handleSelect(r.carrierId, r.annualPremium)}
-                    disabled={selected !== null}
-                    className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${
-                      selected === r.carrierId
-                        ? 'bg-green-600 text-white'
-                        : 'bg-stone-900 hover:bg-red-600 text-white disabled:opacity-40'
-                    }`}
-                  >
-                    {selected === r.carrierId ? '✓ Seleccionado' : 'Seleccionar →'}
-                  </button>
+                <div className="mb-8">
+                  <span className="text-on-surface-variant block mb-1">Precio Anual</span>
+                  <div className="text-[2.5rem] font-black text-primary leading-none">${r.annualPremium.toLocaleString('es-MX')} <span className="text-xl font-bold">MXN</span></div>
                 </div>
+
+                <ul className="space-y-3 mb-10 text-on-surface-variant">
+                  {r.coverage.danosMaterialesDeducible && (
+                    <li className="flex items-center gap-3">
+                      <span className="material-symbols-outlined text-secondary" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
+                      Daños Materiales ({r.coverage.danosMaterialesDeducible})
+                    </li>
+                  )}
+                  {r.coverage.roboTotal && (
+                    <li className="flex items-center gap-3">
+                      <span className="material-symbols-outlined text-secondary" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
+                      Robo Total ({r.coverage.roboTotal})
+                    </li>
+                  )}
+                  {r.coverage.rcMonto && (
+                    <li className="flex items-center gap-3">
+                      <span className="material-symbols-outlined text-secondary" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
+                      RC ${r.coverage.rcMonto}
+                    </li>
+                  )}
+                  {r.coverage.gastosMedicos && (
+                    <li className="flex items-center gap-3">
+                      <span className="material-symbols-outlined text-secondary" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
+                      Gastos Médicos ${r.coverage.gastosMedicos}
+                    </li>
+                  )}
+                  {r.coverage.asistenciaVial && (
+                    <li className="flex items-center gap-3">
+                      <span className="material-symbols-outlined text-secondary" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
+                      Asistencia Vial Incluida
+                    </li>
+                  )}
+                </ul>
+
+                <button
+                  onClick={() => handleSelect(r.carrierId, r.annualPremium)}
+                  disabled={selected !== null}
+                  className={`w-full py-6 rounded-xl text-xl font-bold editorial-shadow transition-all active:scale-95 flex items-center justify-center gap-3 ${
+                    selected === r.carrierId
+                      ? 'bg-secondary text-white'
+                      : 'bg-primary text-white hover:brightness-110 disabled:opacity-60 disabled:pointer-events-none'
+                  }`}
+                >
+                  {selected === r.carrierId ? '✓ Seleccionado' : 'Elegir esta opción'}
+                  {selected !== r.carrierId && <span className="material-symbols-outlined">arrow_forward</span>}
+                </button>
               </div>
             </div>
           ))}
         </div>
 
-        <p className="text-center text-xs text-stone-400 mt-6">
-          Precios estimados. La prima final puede variar según verificación de datos.
-        </p>
-      </div>
-    </main>
+        <div className="mt-16 bg-primary-fixed text-on-primary-fixed p-8 rounded-xl flex flex-col items-center text-center gap-4">
+          <span className="material-symbols-outlined text-4xl">contact_support</span>
+          <h3 className="text-xl font-black">¿Necesitas ayuda para decidir?</h3>
+          <p className="font-medium">Nuestros asesores están listos para guiarte en tu elección.</p>
+          <button className="mt-2 text-primary font-bold border-2 border-primary px-8 py-3 rounded-full hover:bg-primary hover:text-white transition-all">
+            Llamar a un asesor
+          </button>
+        </div>
+      </main>
+    </div>
   )
 }
