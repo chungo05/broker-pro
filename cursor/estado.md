@@ -1,6 +1,6 @@
 # Estado del proyecto
 
-Última actualización: Abril 2025
+Última actualización: Abril 2026
 
 ## ✅ Hecho
 
@@ -21,11 +21,14 @@
 ### API
 - [x] `POST /api/quote` — valida con Zod, llama carriers, guarda en DB
 - [x] `PATCH /api/quote/[id]/select` — guarda selección del cliente
+- [x] `PATCH /api/quote/[id]/emit` — guarda datos del cliente y marca `status = EMITTED`
+- [x] `GET /api/quote/[id]/pdf` — genera PDF de la cotización (Node runtime)
 
 ### UI del cliente
 - [x] `/cotizar` — formulario (marca, modelo, año, uso, CP, cobertura)
 - [x] `/cotizar/[id]` — resultados con tarjetas ordenadas por precio
 - [x] `ResultsClient.tsx` — client component con selección
+- [x] `/cotizar/[id]/confirmar` — datos del cliente + resumen + descarga PDF
 
 ### Base de datos
 - [x] Schema de Prisma definido (Quote, QuoteStatus)
@@ -35,35 +38,35 @@
 
 ## ⚠️ Pendiente de verificar
 
-- [ ] `npx tsc --noEmit` pasa sin errores
-  - Error conocido: `db.ts` importa de `generated/prisma` pero falta correr `npx prisma generate`
-  - Error conocido: `schema.prisma` no debe tener `url` en el datasource (Prisma v7)
-- [ ] `npx prisma generate` corre sin errores
-- [ ] `npx prisma migrate dev` crea las tablas
+- [x] `npx tsc --noEmit` pasa sin errores
+- [x] `npx prisma generate` corre sin errores
+- [ ] `npx prisma migrate dev` crea las tablas (depende de tener Postgres y `DATABASE_URL` válido)
 - [ ] El formulario de cotización conecta con el API y redirige a resultados
 - [ ] Los resultados se renderizan correctamente
+- [ ] Flujo completo `SELECTED → EMITTED` (confirmación) con DB real
+- [ ] Descarga de PDF con DB real (verifica contenido y headers)
 
 ---
 
 ## ❌ Por construir
 
-### Testing (próximo paso inmediato)
-- [ ] Instalar y configurar Vitest
-- [ ] Tests unitarios de `utils.ts` — `yearFactor()`, factores de cobertura
-- [ ] Tests unitarios de carriers — estructura del `QuoteResult`
-- [ ] Tests del orquestador — orden por precio, manejo de fallos parciales
-- [ ] Tests del API route — validación Zod rechaza inputs inválidos
+### Testing
+- [x] Vitest instalado y configurado
+- [x] Tests unitarios de `utils.ts` — `yearFactor()`, factores de cobertura
+- [x] Tests del orquestador — orden por precio, manejo de fallos parciales (con mocks)
+- [x] Tests de schemas Zod (`quote` y `emit`)
+- [ ] Tests de API routes (pendiente; ideal con DB efímera o test DB)
 
 ### Página de confirmación
-- [ ] `/cotizar/[id]/confirmar` — formulario de datos del cliente
+- [x] `/cotizar/[id]/confirmar` — formulario de datos del cliente
   - Campos: nombre, email, teléfono, RFC (opcional)
   - Resumen de la cotización seleccionada (carrier, prima, coberturas)
   - Botón "Solicitar póliza" → `status = EMITTED`
 
 ### Generación de PDF
-- [ ] Instalar `@react-pdf/renderer` (más simple) o Puppeteer
-- [ ] Componente PDF con: datos del auto, carrier elegido, coberturas, prima
-- [ ] API route `GET /api/quote/[id]/pdf` que devuelve el PDF
+- [x] `@react-pdf/renderer`
+- [x] Componente PDF con: datos del auto, carrier elegido, coberturas, prima
+- [x] API route `GET /api/quote/[id]/pdf` que devuelve el PDF
 
 ### Dashboard admin
 - [ ] Configurar NextAuth con un usuario hardcodeado (email + password en `.env`)
@@ -73,7 +76,7 @@
 - [ ] Alertas de pólizas próximas a vencer
 
 ### Carriers adicionales
-- [ ] `qualitas.ts` — mock (olvidado en la sesión anterior)
+- [x] `qualitas.ts` — mock
 - [ ] `mapfre.ts` — mock
 - [ ] Integración real ANA Seguros (cuando el cliente entregue credenciales)
 
@@ -95,3 +98,4 @@
 | `db.ts` en `src/app/lib/` | Path incorrecto | Movido a `src/lib/db.ts` |
 | Select route en `src/app/cotizar/[id]/select/` | Era ruta de página | Movido a `src/app/api/quote/[id]/select/` |
 | Caché de Next.js apuntando a paths viejos | `.next/` desactualizado | `rm -rf .next` |
+| `PrismaConfigEnvError: DATABASE_URL` | Prisma CLI no leía `.env` | Cargar `.env`/`.env.local` en `prisma.config.ts` con `dotenv` |

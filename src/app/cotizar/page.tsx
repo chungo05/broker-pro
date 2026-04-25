@@ -28,7 +28,7 @@ const MODELS: Record<string, string[]> = {
   seat:      ['Ibiza', 'León', 'Arona', 'Ateca'],
 }
 
-const YEARS = Array.from({ length: 10 }, (_, i) => 2026 - i)
+const YEARS = Array.from({ length: 20 }, (_, i) => 2026 - i)
 
 const COVERAGES = [
   { value: 'amplia',      label: 'Amplia',      desc: 'Daños, robo, RC, GM' },
@@ -40,6 +40,7 @@ const COVERAGES = [
 export default function CotizarPage() {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   const [form, setForm] = useState({
     brand: '', model: '', year: 2024,
     uso: 'particular', zipCode: '', coverage: 'amplia',
@@ -53,17 +54,42 @@ export default function CotizarPage() {
     if (!form.brand || !form.model || !form.zipCode) return
 
     setLoading(true)
+    setError(null)
     try {
       const res = await fetch('/api/quote', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...form, year: Number(form.year) }),
       })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.error)
-      router.push(`/cotizar/${data.quoteId}`)
+      const contentType = res.headers.get('content-type') ?? ''
+      const payload =
+        contentType.includes('application/json')
+          ? await res.json()
+          : await res.text()
+
+      if (!res.ok) {
+        const msg =
+          typeof payload === 'string'
+            ? payload
+            : typeof payload?.error === 'string'
+              ? payload.error
+              : 'No se pudo crear la cotización'
+        setError(msg)
+        setLoading(false)
+        return
+      }
+
+      const quoteId =
+        typeof payload === 'string' ? null : (payload?.quoteId as string | undefined)
+      if (!quoteId) {
+        setError('Respuesta inválida del servidor')
+        setLoading(false)
+        return
+      }
+      router.push(`/cotizar/${quoteId}`)
     } catch (err) {
       console.error(err)
+      setError('Error de red. Intenta de nuevo.')
       setLoading(false)
     }
   }
@@ -81,6 +107,11 @@ export default function CotizarPage() {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
+          {error ? (
+            <p className="text-sm text-red-600 bg-red-50 border border-red-100 rounded-lg px-3 py-2">
+              {error}
+            </p>
+          ) : null}
           {/* Marca */}
           <div>
             <label className="block text-xs font-semibold uppercase tracking-wider text-stone-500 mb-1.5">

@@ -10,15 +10,20 @@ broker-pro/
 │   │   │   └── quote/
 │   │   │       ├── route.ts                  ← POST /api/quote
 │   │   │       └── [id]/
-│   │   │           └── select/
-│   │   │               └── route.ts          ← PATCH /api/quote/[id]/select
+│   │   │           ├── select/
+│   │   │           │   └── route.ts          ← PATCH /api/quote/[id]/select
+│   │   │           ├── emit/
+│   │   │           │   └── route.ts          ← PATCH /api/quote/[id]/emit
+│   │   │           └── pdf/
+│   │   │               └── route.tsx         ← GET /api/quote/[id]/pdf (Node runtime)
 │   │   ├── cotizar/
 │   │   │   ├── page.tsx                      ← Formulario del cliente
 │   │   │   └── [id]/
 │   │   │       ├── page.tsx                  ← Server component — lee quote de DB
 │   │   │       ├── ResultsClient.tsx         ← Client component — tarjetas de resultados
 │   │   │       └── confirmar/
-│   │   │           └── page.tsx              ← (PENDIENTE) Datos del cliente + resumen
+│   │   │           ├── page.tsx              ← Datos del cliente + resumen + PDF
+│   │   │           └── ConfirmarClient.tsx   ← Client component — formulario + UX
 │   │   ├── admin/                            ← (PENDIENTE) Dashboard protegido
 │   │   │   └── page.tsx
 │   │   ├── page.tsx
@@ -26,6 +31,10 @@ broker-pro/
 │   │   └── globals.css
 │   └── lib/
 │       ├── db.ts                             ← Singleton Prisma v7 con adapter pg
+│       ├── quote-schema.ts                    ← Zod schema para POST /api/quote
+│       ├── emit-quote-schema.ts               ← Zod schema para PATCH /emit
+│       └── pdf/
+│           └── quote-document.tsx             ← React-PDF Document
 │       └── carriers/
 │           ├── types.ts                      ← QuoteRequest, QuoteResult, Coverage
 │           ├── utils.ts                      ← BRAND_BASE, COVERAGE_FACTOR, yearFactor()
@@ -33,7 +42,8 @@ broker-pro/
 │           ├── ana.ts                        ← Mock ANA Seguros
 │           ├── gnp.ts                        ← Mock GNP
 │           ├── axa.ts                        ← Mock AXA
-│           └── hdi.ts                        ← Mock HDI
+│           ├── hdi.ts                        ← Mock HDI
+│           └── qualitas.ts                   ← Mock Qualitas
 ├── prisma/
 │   └── schema.prisma
 ├── prisma.config.ts                          ← Config de Prisma v7 (nuevo en v7)
@@ -64,8 +74,8 @@ PATCH /api/quote/[id]/select
 (PENDIENTE) /cotizar/[id]/confirmar
   → Cliente llena nombre, email, teléfono
   → Resumen de cobertura elegida
-  → Botón "Solicitar póliza" → status EMITTED
-  → Genera PDF
+  → PATCH /api/quote/[id]/emit → status EMITTED
+  → Descarga de PDF: GET /api/quote/[id]/pdf
         ↓
 (PENDIENTE) Admin recibe notificación
   → Dashboard muestra nueva cotización
@@ -102,6 +112,7 @@ model Quote {
   clientName      String?
   clientEmail     String?
   clientPhone     String?
+  clientRfc       String?
   status    QuoteStatus @default(PENDING)
 
   @@index([createdAt])
@@ -126,13 +137,13 @@ NEXTAUTH_URL=http://localhost:3000
 ## Notas de Prisma v7
 
 Prisma 7 requiere `prisma.config.ts` en la raíz. La URL ya no va en `schema.prisma`.
-El cliente se importa desde `generated/prisma`, no desde `@prisma/client`.
+El cliente se importa desde `@prisma/client` (generado en `node_modules/@prisma/client`).
 Se requiere `@prisma/adapter-pg` para conectar a PostgreSQL.
 
 ```typescript
 // src/lib/db.ts
 import { PrismaPg } from '@prisma/adapter-pg'
-import { PrismaClient } from 'generated/prisma'
+import { PrismaClient } from '@prisma/client'
 
 function createPrismaClient() {
   const adapter = new PrismaPg({
@@ -144,17 +155,19 @@ function createPrismaClient() {
 
 ```typescript
 // prisma.config.ts
+import { existsSync } from 'node:fs'
 import path from 'node:path'
-import { defineConfig } from 'prisma/config'
+import { config as loadEnv } from 'dotenv'
+import { defineConfig, env } from 'prisma/config'
 
 export default defineConfig({
-  earlyAccess: true,
   schema: path.join('prisma', 'schema.prisma'),
-  migrate: {
-    async adapter() {
-      const { PrismaPg } = await import('@prisma/adapter-pg')
-      return new PrismaPg({ connectionString: process.env.DATABASE_URL! })
-    },
+  datasource: {
+    url: env('DATABASE_URL'),
   },
 })
 ```
+
+## Nota importante (Next.js 16)
+
+En rutas dinámicas (`app/.../[id]`), `params` y `searchParams` llegan tipados como `Promise<...>` en los handlers/server components. Se usa `const { id } = await params`.
