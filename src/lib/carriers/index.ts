@@ -1,10 +1,11 @@
 import type { QuoteRequest, QuoteResult } from './types'
-import { quoteAna }      from './ana'
-import { quoteAxa }      from './axa'
-import { quoteHdi }      from './hdi'
-import { quoteGnp }      from './gnp'
+import { quoteAna } from './ana'
+import { quoteAxa } from './axa'
+import { quoteHdi } from './hdi'
+import { quoteGnp } from './gnp'
+import { quoteQualitas } from './qualitas'
 
-const CARRIERS = [quoteAna, quoteAxa, quoteHdi, quoteGnp]
+const CARRIERS = [quoteAna, quoteAxa, quoteHdi, quoteGnp, quoteQualitas]
 
 export async function quoteAll(req: QuoteRequest): Promise<QuoteResult[]> {
   // Todas en paralelo — si una falla, no rompe las demás
