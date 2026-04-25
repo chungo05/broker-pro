@@ -4,12 +4,12 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "npx prisma generate && next build",
+    "build": "DATABASE_URL=postgresql://dummy:dummy@localhost/dummy npx prisma generate && next build",
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run",
     "test:watch": "vitest",
-    "postinstall": "prisma generate"
+    "postinstall": "DATABASE_URL=postgresql://dummy:dummy@localhost/dummy prisma generate"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.8.0",
