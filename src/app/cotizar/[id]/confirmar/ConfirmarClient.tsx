@@ -113,6 +113,14 @@ export default function ConfirmarClient({ quote, selectedResult, readOnly }: Pro
               <p className="text-xs text-stone-400">anual</p>
             </div>
           </div>
+          <a
+            href={`/api/quote/${quote.id}/pdf`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-4 inline-block text-sm font-semibold text-red-700 hover:text-red-800 underline decoration-red-200 underline-offset-2"
+          >
+            Descargar cotización en PDF
+          </a>
         </div>
 
         {readOnly ? (
