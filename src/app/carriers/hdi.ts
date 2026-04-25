@@ -4,7 +4,7 @@ import { BRAND_BASE, COVERAGE_FACTOR, yearFactor } from './utils'
 // Por ahora: mock con la estructura exacta de lo que devolverá
 // la integración real con el micrositio de ANA.
 // Cuando tengas las credenciales, solo reemplazas este cuerpo.
-export async function quoteAna(req: QuoteRequest): Promise<QuoteResult> {
+export async function quoteHdi(req: QuoteRequest): Promise<QuoteResult> {
   const start = Date.now()
 
   // Simula latencia de red real (400–900ms)
