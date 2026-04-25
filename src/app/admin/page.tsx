@@ -33,7 +33,10 @@ export default async function AdminPage(props: {
     ]
   }
 
-  const [totalQuotes, convertedQuotes, premiumStats, quotes] = await Promise.all([
+  const elevenMonthsAgo = new Date()
+  elevenMonthsAgo.setMonth(elevenMonthsAgo.getMonth() - 11)
+
+  const [totalQuotes, convertedQuotes, premiumStats, quotes, expiringQuotes] = await Promise.all([
     prisma.quote.count(),
     prisma.quote.count({ where: { status: { in: ['SELECTED', 'EMITTED'] } } }),
     prisma.quote.aggregate({
@@ -44,6 +47,14 @@ export default async function AdminPage(props: {
       where,
       orderBy: { createdAt: 'desc' },
       take: 200,
+    }),
+    prisma.quote.findMany({
+      where: { 
+        status: 'EMITTED', 
+        createdAt: { lte: elevenMonthsAgo }
+      },
+      orderBy: { createdAt: 'asc' },
+      take: 5
     })
   ])
 
@@ -84,6 +95,43 @@ export default async function AdminPage(props: {
               ${averagePremium.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </p>
           </div>
+        </div>
+
+        {/* Alerts */}
+        <div className="bg-amber-50 border border-amber-200 p-6 rounded-2xl shadow-sm">
+          <h3 className="text-amber-800 font-semibold mb-2 flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+            </svg>
+            Alertas: Pólizas próximas a vencer
+          </h3>
+          {expiringQuotes.length === 0 ? (
+            <p className="text-amber-700 text-sm">No hay pólizas próximas a vencer (más de 11 meses de antigüedad).</p>
+          ) : (
+            <ul className="space-y-2 mt-4 text-sm text-amber-900">
+              {expiringQuotes.map((q) => (
+                <li key={q.id} className="flex items-center justify-between bg-amber-100/50 p-3 rounded-lg border border-amber-200/50">
+                  <div>
+                    <span className="font-semibold">{q.clientName || q.clientEmail || 'Cliente sin nombre'}</span>
+                    <span className="mx-2 text-amber-700/50">|</span>
+                    <span>{q.brand} {q.model} {q.year}</span>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <span className="text-amber-700 text-xs">
+                      Emitida el {q.createdAt.toLocaleDateString('es-MX')}
+                    </span>
+                    <Link
+                      href={`/cotizar/${q.id}`}
+                      target="_blank"
+                      className="text-amber-700 font-medium hover:text-amber-900 underline text-xs"
+                    >
+                      Ver detalle
+                    </Link>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
 
         {/* Filters */}

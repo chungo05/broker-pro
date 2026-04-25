@@ -58,7 +58,7 @@ npm run dev
 6. **Admin (Dashboard)**
 - Abre `http://localhost:3000/admin` — te pide inicio de sesión
 - Entra con `ADMIN_EMAIL` / `ADMIN_PASSWORD` (definidos en tu `.env`)
-- Verás un dashboard con KPIs (cotizaciones totales, conversión, prima promedio)
+- Verás un dashboard con KPIs (cotizaciones totales, conversión, prima promedio) y alertas de pólizas próximas a vencer
 - Puedes buscar clientes o filtrar las cotizaciones por su estado
 - En la tabla de las últimas cotizaciones, el enlace del vehículo abre el detalle en otra pestaña
 

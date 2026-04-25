@@ -64,7 +64,7 @@
 - [x] Tests unitarios de `utils.ts` — `yearFactor()`, factores de cobertura
 - [x] Tests del orquestador — orden por precio, manejo de fallos parciales (con mocks)
 - [x] Tests de schemas Zod (`quote` y `emit`)
-- [ ] Tests de API routes (pendiente; ideal con DB efímera o test DB)
+- [x] Tests de API routes (e.g., `POST /api/quote` usando mocks de DB)
 
 ### Página de confirmación
 - [x] `/cotizar/[id]/confirmar` — formulario de datos del cliente
@@ -83,7 +83,7 @@
 - [x] Lista básica de cotizaciones
 - [x] Filtros (status, fecha) y búsqueda
 - [x] KPIs: total cotizaciones, tasa conversión (SELECTED/total), prima promedio
-- [ ] Alertas de pólizas próximas a vencer
+- [x] Alertas de pólizas próximas a vencer
 
 ### Carriers adicionales
 - [x] `qualitas.ts` — mock
@@ -91,8 +91,8 @@
 - [ ] Integración real ANA Seguros (cuando el cliente entregue credenciales)
 
 ### Infraestructura
-- [ ] Configurar proyecto en Railway (PostgreSQL)
-- [ ] Configurar proyecto en Vercel
+- [ ] Configurar proyecto en DigitalOcean (PostgreSQL)
+- [ ] Configurar proyecto en DigitalOcean para hacer deploy
 - [ ] Variables de entorno en producción
 - [ ] `npx prisma migrate deploy` en producción
 

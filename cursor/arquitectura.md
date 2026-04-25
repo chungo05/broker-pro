@@ -35,7 +35,7 @@ broker-pro/
 │   │   ├── layout.tsx
 │   │   ├── providers.tsx                  ← `SessionProvider` (NextAuth)
 │   │   └── globals.css
-│   ├── middleware.ts                        ← Protege `/admin/*` excepto `/admin/login`
+│   ├── proxy.ts                             ← Protege `/admin/*` excepto `/admin/login` (Reemplaza a middleware.ts)
 │   └── lib/
 │       ├── db.ts                             ← Prisma v7 + `pg.Pool` (SSL, Digital Ocean)
 │       ├── auth.ts                           ← `authOptions` NextAuth (Credentials)
