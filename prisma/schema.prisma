@@ -1,0 +1,49 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Quote {
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+
+  // Datos del vehículo
+  brand       String
+  model       String
+  year        Int
+  uso         String
+  zipCode     String
+  coverage    String   // amplia | amplia_plus | basica | rc
+
+  // Resultados guardados (JSON con todas las respuestas)
+  results     Json
+
+  // Si el cliente eligió alguna
+  selectedCarrier   String?
+  selectedPremium   Float?
+
+  // Datos del cliente (opcionales hasta que elige)
+  clientName        String?
+  clientEmail       String?
+  clientPhone       String?
+
+  status      QuoteStatus @default(PENDING)
+
+  @@index([createdAt])
+  @@index([status])
+}
+
+enum QuoteStatus {
+  PENDING     // cotizó pero no eligió
+  SELECTED    // eligió aseguradora
+  EMITTED     // póliza emitida (fase futura)
+}
